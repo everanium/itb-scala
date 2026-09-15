@@ -1,0 +1,15 @@
+# sbt build output
+target/
+project/target/
+project/project/
+
+# BSP / IDE tooling
+.bsp/
+.bloop/
+.metals/
+.idea/
+.vscode/
+metals.sbt
+
+# eitb launcher classpath cache
+eitb/.classpath

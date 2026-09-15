@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# eitb launcher for the Scala binding. Compiles on first use (via
+# sbt), caches the runtime classpath in eitb/.classpath, then execs a
+# plain JVM — so repeat invocations skip sbt start-up entirely.
+# Delete eitb/.classpath (or re-run build.sh) after source changes.
+
+set -eu
+set -o pipefail
+
+cd "$(dirname "$0")/.."
+REPO_ROOT="$(cd ../.. && pwd)"
+
+if [ ! -s eitb/.classpath ]; then
+    echo "==> first use: compiling eitb + caching classpath" >&2
+    sbt --batch eitb/compile >&2
+    sbt --batch --error "export eitb/Runtime/fullClasspath" | tail -n 1 > eitb/.classpath
+fi
+
+export ITB_JNI_PATH="${ITB_JNI_PATH:-$REPO_ROOT/bindings/java/build/jni/libitb3_jni.so}"
+
+exec java -cp "$(cat eitb/.classpath)" io.github.everanium.itb3.scala.eitb.Main "$@"
