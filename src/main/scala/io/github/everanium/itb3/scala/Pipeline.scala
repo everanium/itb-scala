@@ -181,3 +181,9 @@ object Pipeline:
   /** The sorted names of every registered profile. */
   def profiles(): Either[ItbError, List[String]] =
     attempt(JPipeline.profiles().asScala.toList)
+
+  /** The names of every hash primitive in the shipped registry, in the
+    * registry's own canonical order.
+    */
+  def hashNames(): Either[ItbError, List[String]] =
+    attempt(JPipeline.hashNames().asScala.toList)

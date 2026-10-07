@@ -2,9 +2,9 @@
 // profile JSON object, re-exported under the Scala package.
 //
 // The record is a plain data holder plus a JSON codec over the wire
-// keys. nonce_bits and barrier_fill are inspection-only —
-// Pipeline.inspect populates them from the blob's runtime globals and
-// Pipeline.lookup leaves both null. No semantic validation happens on
+// keys. nonce_bits, barrier_fill and container_mode are inspection-only —
+// Pipeline.inspect populates them from the blob's inner snapshot and
+// Pipeline.lookup leaves them null. No semantic validation happens on
 // the JVM side — every field rule is enforced by Go at
 // Pipeline.register / Pipeline.load time and surfaces as ItbError.
 

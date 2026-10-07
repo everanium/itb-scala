@@ -78,3 +78,8 @@ lazy val eitb = (project in file("eitb"))
   .dependsOn(root)
   .settings(commonSettings)
   .settings(name := "libitb3-scala-eitb")
+
+lazy val loop = (project in file("loop"))
+  .dependsOn(root)
+  .settings(commonSettings)
+  .settings(name := "libitb3-scala-loop")

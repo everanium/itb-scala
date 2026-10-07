@@ -63,12 +63,12 @@ class PersistSuite extends ItbSuite:
       assertEquals(prof.name(), "streaming-aead-triple-mac-v1")
       assertEquals(prof.mode(), "streaming-aead")
       assertEquals(prof.width(), 512)
-      // The recipe fields match the registry entry; the two
+      // The recipe fields match the registry entry; the
       // inspection-only fields separate the two records.
       val registry = ok(Pipeline.lookup("streaming-aead-triple-mac-v1"))
       assertEquals(
         registry,
-        io.github.everanium.itb3.Profile.fromJson(prof.toJson).nonceBits(null).barrierFill(null)
+        io.github.everanium.itb3.Profile.fromJson(prof.toJson).nonceBits(null).barrierFill(null).containerMode(null)
       )
     }
   }
@@ -130,5 +130,53 @@ class PersistSuite extends ItbSuite:
       ok(pipe.maxWorkers(1000))
       val wire = ok(pipe.encryptMessage(plain))
       assert(ok(pipe.decryptMessage(wire)).sameElements(plain))
+    }
+  }
+
+  test("drbg round trips through a loaded blob") {
+    for drbg <- Seq("csprng", "aesitb128") do
+      Using.resource(ok(Pipeline.init("singlemsg-triple-mac-v1", Opts().withDrbg(drbg)))) { sender =>
+        Using.resource(ok(Pipeline.load(ok(sender.save())))) { receiver =>
+          assert(ok(receiver.decryptMessage(ok(sender.encryptMessage(plain)))).sameElements(plain))
+          assert(ok(sender.decryptMessage(ok(receiver.encryptMessage(plain)))).sameElements(plain))
+        }
+      }
+  }
+
+  test("inspect reports the drbg") {
+    Using.resource(ok(Pipeline.init("singlemsg-triple-mac-v1", Opts().withDrbg("csprng")))) { pipe =>
+      val prof = ok(Pipeline.inspect(ok(pipe.save())))
+      assertEquals(prof.drbg(), "csprng")
+      assert(prof.toJson.contains("\"drbg\":\"csprng\""))
+    }
+  }
+
+  test("unknown drbg is RecipePrimitiveUnknown") {
+    val e = err(Pipeline.init("singlemsg-triple-mac-v1", Opts().withDrbg("nope")))
+    assertEquals(e.status, Status.RecipePrimitiveUnknown)
+    assert(e.getMessage.contains("nope"))
+  }
+
+  test("default drbg is absent") {
+    Using.resource(ok(Pipeline.init("singlemsg-triple-mac-v1"))) { pipe =>
+      val prof = ok(Pipeline.inspect(ok(pipe.save())))
+      assertEquals(prof.drbg(), "")
+      assert(!prof.toJson.contains("\"drbg\""))
+    }
+    assertEquals(ok(Pipeline.lookup("singlemsg-triple-mac-v1")).drbg(), "")
+  }
+
+  test("register copy keeps the drbg") {
+    Using.resource(ok(Pipeline.init("singlemsg-triple-mac-v1", Opts().withDrbg("csprng")))) { pipe =>
+      val copy = ok(Pipeline.inspect(ok(pipe.save())))
+        .name("").nonceBits(null).barrierFill(null).containerMode(null)
+      ok(Pipeline.register("scala-binding-test-drbg-copy", copy))
+      assertEquals(ok(Pipeline.lookup("scala-binding-test-drbg-copy")).drbg(), "csprng")
+      Using.resource(ok(Pipeline.init("scala-binding-test-drbg-copy"))) { sender =>
+        Using.resource(ok(Pipeline.load(ok(sender.save())))) { receiver =>
+          assertEquals(ok(Pipeline.inspect(ok(sender.save()))).drbg(), "csprng")
+          assert(ok(receiver.decryptMessage(ok(sender.encryptMessage(plain)))).sameElements(plain))
+        }
+      }
     }
   }

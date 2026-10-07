@@ -25,6 +25,12 @@ class SmokeSuite extends ItbSuite:
     assertEquals(Runtime.BindingVersion, "0.5.1")
   }
 
+  test("auto DRBG tier is a fill cipher") {
+    // One of the two fill ciphers, resolved per host.
+    val tier = Runtime.drbgAutoTier
+    assert(tier == "aes-256-ctr" || tier == "chacha20", s"drbg auto tier: $tier")
+  }
+
   test("smoke round trip") {
     Using.resource(ok(Pipeline.init("singlemsg-triple-mac-v1"))) { sender =>
       assert(ok(sender.save()).nonEmpty)

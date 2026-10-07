@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 #
-# build.sh -- one-step build for the Scala binding. The binding is a
-# thin proxy over the Java binding (JVM bytecode interop, no FFI hop
-# of its own), so the Java binding is built first (libitb3.so + JNI
-# shim + jars via bindings/java/build.sh), then sbt compiles the
-# Scala library, tests, bench, and eitb. Prerequisites (Go, JDK 17+,
-# Gradle, gcc, sbt) must be installed separately; see README.md
-# "Prerequisites" section.
+# One-step build for the Scala binding. The binding is a thin proxy over
+# the Java binding (JVM bytecode interop, no FFI hop of its own), so the
+# Java binding is built first (libitb3.so + JNI shim + jars via
+# bindings/java/build.sh), then sbt compiles the Scala library, tests,
+# bench, and eitb. Prerequisites (Go, JDK 17+, Gradle, gcc, sbt) must be
+# installed separately; see README.md "Prerequisites" section.
 #
 # The build starts from an empty tree: every sbt target directory
 # (root, bench, eitb and the meta-build under project/), the BSP and
@@ -129,7 +128,7 @@ fi
 
 cd "$BINDING_DIR"
 echo "==> building Scala binding (sbt compile)"
-sbt --batch compile Test/compile bench/Compile/compile eitb/Compile/compile
+sbt --batch compile Test/compile bench/Compile/compile eitb/Compile/compile loop/Compile/compile
 
 echo "==> refreshing eitb launcher classpath cache"
 sbt --batch --error "export eitb/Runtime/fullClasspath" | tail -n 1 > eitb/.classpath
@@ -145,5 +144,14 @@ if ! grep -q 'libitb3-java-' eitb/.classpath; then
     exit 1
 fi
 require_built "$BINDING_DIR/eitb/.classpath"
+
+echo "==> refreshing loop launcher classpath cache"
+sbt --batch --error "export loop/Runtime/fullClasspath" | tail -n 1 > loop/.classpath
+if ! grep -q 'libitb3-java-' loop/.classpath; then
+    echo "build.sh: loop/.classpath does not name the Java binding jar:" >&2
+    cat loop/.classpath >&2
+    exit 1
+fi
+require_built "$BINDING_DIR/loop/.classpath"
 
 echo "==> ready: ./run_tests.sh"

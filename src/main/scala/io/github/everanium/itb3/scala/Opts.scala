@@ -63,6 +63,8 @@ final case class Opts(pairs: Vector[(String, String)] = Vector.empty):
 
   def withOuterCipher(name: String): Opts = withRaw("outerCipher", name)
 
+  def withDrbg(name: String): Opts = withRaw("drbg", name)
+
   /** Comma-joins the palette names (`parallaxPalette`). */
   def withParallaxPalette(names: String*): Opts =
     withRaw("parallaxPalette", names.mkString(","))

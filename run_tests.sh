@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 #
-# run_tests.sh -- one-step test runner for the Scala binding. Builds
-# the Java binding (libitb3.so + JNI shim + jars) and the sbt projects
-# via build.sh, points ITB_JNI_PATH at the freshly-built JNI shim,
-# then invokes `sbt test`. A positional argument narrows the run to a
-# testOnly glob.
+# One-step test runner for the Scala binding. Builds the Java binding
+# (libitb3.so + JNI shim + jars) and the sbt projects via build.sh,
+# points ITB_JNI_PATH at the freshly-built JNI shim, then invokes `sbt
+# test`. A positional argument narrows the run to a testOnly glob.
 #
 # build.sh wipes every sbt target directory and the eitb classpath
 # cache, and delegates the Java layer to bindings/java/build.sh, which

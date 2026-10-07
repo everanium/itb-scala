@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# eitb launcher for the Scala binding. Compiles on first use (via
-# sbt), caches the runtime classpath in eitb/.classpath, then execs a
+# Launcher for the Scala binding's eitb CLI. Compiles on first use (via sbt),
+# caches the runtime classpath in eitb/.classpath, then execs a
 # plain JVM — so repeat invocations skip sbt start-up entirely.
 # Delete eitb/.classpath (or re-run build.sh) after source changes.
 

@@ -13,3 +13,6 @@ metals.sbt
 
 # eitb launcher classpath cache
 eitb/.classpath
+
+# loop launcher classpath cache
+loop/.classpath
