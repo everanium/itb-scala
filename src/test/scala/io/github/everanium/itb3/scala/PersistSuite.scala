@@ -78,16 +78,19 @@ class PersistSuite extends ItbSuite:
     // barrier fill margin, and inspect surfaces both.
     Using.resource(ok(Pipeline.init("streaming-aead-triple-mac-v1"))) { pipe =>
       val prof = ok(Pipeline.inspect(ok(pipe.save())))
+      assertEquals(prof.containerMode(), Integer.valueOf(1))
       assertEquals(prof.nonceBits(), Integer.valueOf(512))
       assertEquals(prof.barrierFill(), Integer.valueOf(1))
     }
 
     // Per-Pipeline overrides travel through the blob into inspect.
-    val opts = Opts().withNonceBits(256).withBarrierFill(4)
+    val opts = Opts().withMode(2).withNonceBits(256).withBarrierFill(4)
     Using.resource(ok(Pipeline.init("streaming-aead-triple-mac-v1", opts))) { pipe =>
       val prof = ok(Pipeline.inspect(ok(pipe.save())))
+      assertEquals(prof.containerMode(), Integer.valueOf(2))
       assertEquals(prof.nonceBits(), Integer.valueOf(256))
       assertEquals(prof.barrierFill(), Integer.valueOf(4))
+      assert(prof.toJson.contains("\"container_mode\":2"))
       assert(prof.toJson.contains("\"nonce_bits\":256"))
       assert(prof.toJson.contains("\"barrier_fill\":4"))
     }
@@ -95,8 +98,10 @@ class PersistSuite extends ItbSuite:
     // The registry entry is the recipe alone — neither field is part
     // of it, so both read as absent rather than as zero.
     val registry = ok(Pipeline.lookup("streaming-aead-triple-mac-v1"))
+    assertEquals(registry.containerMode(), null)
     assertEquals(registry.nonceBits(), null)
     assertEquals(registry.barrierFill(), null)
+    assert(!registry.toJson.contains("container_mode"))
     assert(!registry.toJson.contains("nonce_bits"))
     assert(!registry.toJson.contains("barrier_fill"))
   }

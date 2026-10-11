@@ -89,7 +89,7 @@ blob the receiver loads carries the resolved shape, so `load` takes
 no opts:
 
 ```scala
-val opts = Opts().withChunkSize(65536L).withWrapper(false)
+val opts = Opts().withMode(2L).withChunkSize(65536L).withWrapper(false)
 val sender = Pipeline.init("singlemsg-triple-mac-v1", opts).fold(throw _, identity)
 val receiver = Pipeline.load(sender.save().fold(throw _, identity)).fold(throw _, identity)
 ```

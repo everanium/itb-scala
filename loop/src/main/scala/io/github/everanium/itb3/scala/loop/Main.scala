@@ -742,6 +742,9 @@ object Main:
     */
   private def buildPipeline(cfg: Config, profile: String): Option[(Pipeline, Array[Byte])] =
     var opts = Opts.empty
+    if cfg.blobMode != 1L then
+      opts = opts.withMode(cfg.blobMode)
+    opts = opts
       .withInnerHash(cfg.hash)
       .withMacName(cfg.mac)
       .withParallax(cfg.parallax)
@@ -772,56 +775,8 @@ object Main:
         pipe.close()
         return None
       case Right(b) => b
-    if cfg.blobMode == 2L then
-      // The sizing mode is not an Opts knob: the Init blob is edited
-      // and the pipeline reopened from it, so the retained blob (the
-      // one blob-cycle reopens from) carries the edited mode.
-      if !editInnerBlobMode(blob, 2) then
-        System.err.println("loop: rewrite blob mode: inner blob mode field not found")
-        pipe.close()
-        return None
-      pipe.close()
-      pipe = Pipeline.load(blob) match
-        case Left(e) =>
-          System.err.println(s"loop: reload Mode 2 blob: ${Worker.detail(e)}")
-          return None
-        case Right(p) => p
     logPipelineInitialised(profile, blob)
     Some((pipe, blob))
-
-  /** Offset of the first occurrence of needle in hay at or after from,
-    * or -1 when absent.
-    */
-  private def findBytes(hay: Array[Byte], from: Int, needle: Array[Byte]): Int =
-    var i = from
-    while i + needle.length <= hay.length do
-      var j = 0
-      while j < needle.length && hay(i + j) == needle(j) do j += 1
-      if j == needle.length then return i
-      i += 1
-    -1
-
-  /** Sets the inner blob's "mode" field of a wrap-layer session blob to
-    * targetMode (1 = per-region, 2 = per-container) in place. The wrap
-    * layer's profile record carries its own "mode" (a string), so the
-    * search starts at the inner blob ("ib"); both shipped modes are one
-    * digit wide, so the blob length does not change and the key material
-    * in blob is never copied. Returns false when the inner blob or its
-    * mode field is not found.
-    */
-  private def editInnerBlobMode(blob: Array[Byte], targetMode: Int): Boolean =
-    val ibKey = "\"ib\":{".getBytes(StandardCharsets.US_ASCII)
-    val modeKey = "\"mode\":".getBytes(StandardCharsets.US_ASCII)
-    val ib = findBytes(blob, 0, ibKey)
-    if ib < 0 then return false
-    val mode = findBytes(blob, ib + ibKey.length, modeKey)
-    if mode < 0 then return false
-    val at = mode + modeKey.length
-    if at + 1 >= blob.length || blob(at) < '1' || blob(at) > '2' ||
-        (blob(at + 1) >= '0' && blob(at + 1) <= '9')
-    then return false
-    blob(at) = ('0' + targetMode).toByte
-    true
 
   private def dash(s: String): String = if s.isEmpty then "-" else s
 

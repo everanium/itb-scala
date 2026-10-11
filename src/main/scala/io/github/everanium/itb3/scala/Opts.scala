@@ -22,6 +22,9 @@ final case class Opts(pairs: Vector[(String, String)] = Vector.empty):
     */
   def withRaw(key: String, value: String): Opts = copy(pairs :+ (key -> value))
 
+  /** Overrides the container floor sizing mode: 1 (per-region, default) or 2 (per-container compact). */
+  def withMode(n: Long): Opts = withRaw("mode", n.toString)
+
   /** Hex-encodes the parallax master override (`pm`). */
   def withPermMaster(master: Array[Byte]): Opts = withRaw("pm", Opts.hex(master))
 
