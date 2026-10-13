@@ -13,7 +13,7 @@ import io.github.everanium.itb3.Runtime as JRuntime
 object Runtime:
 
   /** The Scala binding's own version. */
-  val BindingVersion: String = "0.5.6"
+  val BindingVersion: String = "0.6.1"
 
   /** Sets the Go runtime's soft heap limit in bytes and returns the
     * previous limit. A negative value queries without changing.
