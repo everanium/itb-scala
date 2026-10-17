@@ -124,6 +124,32 @@ object Pipeline:
   def init(profile: String, opts: Opts = Opts.empty): Either[ItbError, Pipeline] =
     attempt(new Pipeline(JPipeline.init(profile, opts.toJava)))
 
+  /** Deterministically constructs a Pipeline from eight caller-supplied
+    * master keys (one per canonical seed slot 0..7) against the named
+    * profile and options. The eight master keys must come from
+    * independent entropy or key-agreement sources; never derive all
+    * eight keys from a single secret or a single KDF parent key.
+    */
+  def initKeys(
+      profile: String,
+      masters: Seq[Array[Byte]],
+      opts: Opts = Opts.empty
+  ): Either[ItbError, Pipeline] =
+    attempt(new Pipeline(JPipeline.initKeys(profile, opts.toJava, masters.toArray)))
+
+  /** Deterministically constructs a Pipeline from eight caller-supplied
+    * master keys (one per canonical seed slot 0..7) against the named
+    * profile and options. The eight master keys must come from
+    * independent entropy or key-agreement sources; never derive all
+    * eight keys from a single secret or a single KDF parent key.
+    */
+  def initKeys(
+      profile: String,
+      opts: Opts,
+      masters: Seq[Array[Byte]]
+  ): Either[ItbError, Pipeline] =
+    attempt(new Pipeline(JPipeline.initKeys(profile, opts.toJava, masters.toArray)))
+
   /** Reconstructs a Pipeline from a blob produced by
     * [[Pipeline.save]] or [[Pipeline.rekey]], using the
     * blob-embedded masters. The blob's embedded profile record is the

@@ -185,3 +185,22 @@ class PersistSuite extends ItbSuite:
       }
     }
   }
+
+  test("initKeys determinism and validation") {
+    val masters: Seq[Array[Byte]] = (0 until 8).map(i => Array.fill[Byte](32)((0x11 * (i + 1)).toByte))
+    Using.resource(ok(Pipeline.initKeys("singlemsg-triple-mac-v1", masters))) { p1 =>
+      Using.resource(ok(Pipeline.initKeys("singlemsg-triple-mac-v1", masters))) { p2 =>
+        val b1 = ok(p1.save())
+        val b2 = ok(p2.save())
+        assert(b1.sameElements(b2))
+        val wire = ok(p1.encryptMessage(plain))
+        assert(ok(p2.decryptMessage(wire)).sameElements(plain))
+      }
+    }
+
+    val dup = masters.updated(1, masters.head.clone())
+    assertEquals(err(Pipeline.initKeys("singlemsg-triple-mac-v1", dup)).status, Status.BadInput)
+
+    val shortKeys = masters.updated(0, Array.fill[Byte](8)(0x11))
+    assertEquals(err(Pipeline.initKeys("singlemsg-triple-mac-v1", shortKeys)).status, Status.BadInput)
+  }

@@ -18,7 +18,7 @@ idiom: every fallible call returns `Either[ItbError, _]` (the error
 value is also a `RuntimeException`, so throw-based interop stays a
 one-liner), results are case classes, `Opts` is an immutable
 chainable value, and `Pipeline` / stream sessions are `AutoCloseable`
-for `scala.util.Using.resource`. The surface includes a `Profile` record
+for `scala.util.Using.resource`. The surface includes `Pipeline.init` / `Pipeline.initKeys`, a `Profile` record
 with the registry entries `Pipeline.register` / `lookup` / `profiles`
 and the blob reader `Pipeline.inspect`, plus the Go runtime knobs on
 `Runtime`. The stream sessions additionally expose
@@ -93,6 +93,8 @@ val opts = Opts().withMode(2L).withChunkSize(65536L).withWrapper(false)
 val sender = Pipeline.init("singlemsg-triple-mac-v1", opts).fold(throw _, identity)
 val receiver = Pipeline.load(sender.save().fold(throw _, identity)).fold(throw _, identity)
 ```
+
+`Pipeline.initKeys` constructs a `Pipeline` deterministically from eight caller-supplied master keys (one per seed slot `0..7`) via per-slot KDF, so two peers holding the same eight master keys derive identical `Pipeline` instances without exchanging a session blob. The eight master keys must come from independent entropy or key-agreement sources — never derive all eight keys from a single secret or a single KDF parent key.
 
 `Pipeline.rekey` rotates the parallax + wrapper masters mid-session
 (the eight ITB seeds and MAC key are fixed for the session lifetime
