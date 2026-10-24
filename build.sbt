@@ -19,7 +19,7 @@ val javaBindingJars = Def.setting {
 
 lazy val commonSettings = Seq(
   organization := "io.github.everanium",
-  version := "0.7.4",
+  version := "0.7.5",
   description := "ITB Symmetric Cipher Construction with Ambiguity-Based Security - Scala",
   homepage := Some(url("https://github.com/everanium/itb")),
   licenses := Seq(
