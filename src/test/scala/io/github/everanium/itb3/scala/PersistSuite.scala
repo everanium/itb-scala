@@ -186,6 +186,26 @@ class PersistSuite extends ItbSuite:
     }
   }
 
+  test("interlock round trips, inspects, loads, and validates") {
+    Using.resource(ok(Pipeline.init("singlemsg-triple-mac-v1", Opts().withInterlock("168")))) { sender =>
+      val wire = ok(sender.encryptMessage(plain))
+      assert(ok(sender.decryptMessage(wire)).sameElements(plain))
+      val blob = ok(sender.save())
+      val prof = ok(Pipeline.inspect(blob))
+      assertEquals(prof.interlock(), "168")
+      assert(prof.toJson.contains("\"interlock\":\"168\""))
+      Using.resource(ok(Pipeline.load(blob))) { receiver =>
+        assert(ok(receiver.decryptMessage(wire)).sameElements(plain))
+      }
+    }
+
+    val e1 = err(Pipeline.init("singlemsg-triple-mac-v1", Opts().withInnerHash("blake3").withInterlock("168")))
+    assertEquals(e1.status, Status.BadInput)
+
+    val e2 = err(Pipeline.init("singlemsg-triple-mac-v1", Opts().withInterlock("96")))
+    assertEquals(e2.status, Status.BadInput)
+  }
+
   test("initKeys determinism and validation") {
     val masters: Seq[Array[Byte]] = (0 until 8).map(i => Array.fill[Byte](32)((0x11 * (i + 1)).toByte))
     Using.resource(ok(Pipeline.initKeys("singlemsg-triple-mac-v1", masters))) { p1 =>

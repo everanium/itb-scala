@@ -25,6 +25,9 @@ final case class Opts(pairs: Vector[(String, String)] = Vector.empty):
   /** Overrides the container floor sizing mode: 1 (per-region, default) or 2 (per-container compact). */
   def withMode(n: Long): Opts = withRaw("mode", n.toString)
 
+  /** Interlock width in bits: `"48"` | `"168"`, `""` = default 48-bit; `"168"` requires a 512-bit hash. */
+  def withInterlock(interlock: String): Opts = withRaw("interlock", interlock)
+
   /** Hex-encodes the parallax master override (`pm`). */
   def withPermMaster(master: Array[Byte]): Opts = withRaw("pm", Opts.hex(master))
 

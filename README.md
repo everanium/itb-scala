@@ -89,10 +89,12 @@ blob the receiver loads carries the resolved shape, so `load` takes
 no opts:
 
 ```scala
-val opts = Opts().withMode(2L).withChunkSize(65536L).withWrapper(false)
+val opts = Opts().withMode(2L).withInterlock("168").withChunkSize(65536L).withWrapper(false)
 val sender = Pipeline.init("singlemsg-triple-mac-v1", opts).fold(throw _, identity)
 val receiver = Pipeline.load(sender.save().fold(throw _, identity)).fold(throw _, identity)
 ```
+
+`Opts.withInterlock` sets the interlock width in bits (`"48"` | `"168"`, `""` = default 48-bit; `"168"` requires a 512-bit hash).
 
 `Pipeline.initKeys` constructs a `Pipeline` deterministically from eight caller-supplied master keys (one per seed slot `0..7`) via per-slot KDF, so two peers holding the same eight master keys derive identical `Pipeline` instances without exchanging a session blob. The eight master keys must come from independent entropy or key-agreement sources — never derive all eight keys from a single secret or a single KDF parent key.
 

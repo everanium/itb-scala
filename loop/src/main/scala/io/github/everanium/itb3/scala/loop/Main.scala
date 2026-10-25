@@ -71,6 +71,7 @@ final class Config(
     val chunkSize: Long,
     val barrierFill: Long,
     val drbg: String,
+    val interlock: String,
     val gomaxprocs: Int,
     val rekeyEvery: Long,
     val blobCycleEvery: Long,
@@ -185,6 +186,7 @@ private final class RawFlags:
   var gomaxprocs = 0L
   var goroutines = 3L
   var hash = "areion512"
+  var interlock = ""
   var iterations = 0L
   var jsonOutput = false
   var keyBits = 0L
@@ -335,6 +337,12 @@ object Main:
         "inner ITB hash primitive name",
         false, defaultOf(d.hash),
         (f, s) => { f.hash = s; true }
+      ),
+      Flag(
+        "interlock", "string",
+        "Interlocked Barrier chunk width: 48 | 168; empty = profile default (48; 168 requires 512-bit hash)",
+        false, defaultOf(d.interlock),
+        (f, s) => { f.interlock = s; true }
       ),
       Flag(
         "iterations", "int",
@@ -629,6 +637,11 @@ object Main:
           s"got ${f.barrierFill}"
       )
       return (None, 2)
+    if !Set("", "48", "168").contains(f.interlock) then
+      System.err.println(
+        s"""loop: --interlock must be 48 | 168 (or empty = profile default), got "${f.interlock}""""
+      )
+      return (None, 2)
     val chunkSize = Size.parseSize(f.chunkSize) match
       case Some(v) => v
       case None =>
@@ -658,6 +671,7 @@ object Main:
           memlimit, memlimitAuto, f.gogc.toInt, parallax, wrapper, f.profile, f.keyBits,
           f.nonceBits, f.blobMode, chunkSize, f.barrierFill,
           f.drbg, // validated by Init: the C ABI enumerates no DRBG names
+          f.interlock,
           f.gomaxprocs.toInt, f.rekeyEvery,
           f.blobCycleEvery, payloadMode, f.seed, f.jsonOutput, f.memprofile
         )
@@ -753,6 +767,7 @@ object Main:
       .withNonceBits(cfg.nonceBits)
       .withBarrierFill(cfg.barrierFill)
       .withDrbg(cfg.drbg)
+      .withInterlock(cfg.interlock)
       .withChunkSize(cfg.chunkSize)
     if cfg.profile.nonEmpty then
       fillKeystreamLayers(cfg.profile, opts, cfg.parallax, cfg.wrapper) match
@@ -807,7 +822,8 @@ object Main:
             (if rec.containerMode() != null && rec.containerMode().intValue == 2 then
                " container-mode=2"
              else "") +
-            (if rec.drbg().isEmpty then "" else s" drbg=${rec.drbg()}")
+            (if rec.drbg().isEmpty then "" else s" drbg=${rec.drbg()}") +
+            (if rec.interlock().isEmpty then "" else s" interlock=${rec.interlock()}")
         )
 
   private def run(args: Array[String]): Int =
@@ -862,7 +878,8 @@ object Main:
         s" seed=${java.lang.Long.toUnsignedString(cfg.seed)}" +
         s" json-output=${if cfg.jsonOutput then "true" else "false"}" +
         (if cfg.blobMode != 1L then s" blob-mode=${cfg.blobMode}" else "") +
-        (if cfg.drbg.isEmpty then "" else s" drbg=${cfg.drbg}")
+        (if cfg.drbg.isEmpty then "" else s" drbg=${cfg.drbg}") +
+        (if cfg.interlock.isEmpty then "" else s" interlock=${cfg.interlock}")
     )
     logLine(
       s"""policy: microbatch-tiers=${policyLabel("ITB_MICROBATCH_TIERS")}""" +
