@@ -5,7 +5,7 @@ a8d01c458a771c31fbc9b223e4ddcdfcc0f218d77db911b6c95ef2dbe925c412  .gitignore
 e8482dfeefa53c6d8a7b60f6b2f1411db27ce61b7db7ea3c575f699746415e0f  bench/src/main/scala/io/github/everanium/itb3/scala/bench/BenchStreamOneShot.scala
 2acc7ed339399a7ad5d206377b79d87b8b60bbfd3e8c4eab2f6116bd56b98629  bench/src/main/scala/io/github/everanium/itb3/scala/bench/BenchUtil.scala
 9529bb60335dcadb4c3344241eee12b8c8c67766445896be6f97f4c166d93e84  bench/src/main/scala/io/github/everanium/itb3/scala/bench/Main.scala
-102b2f8725d46299b17af0415dab4f4fd79bc0ca6b1dfd603909c173b53fb55c  build.sbt
+2d41324586fe558cf62073a98ed670640adb81648763a784b604ee3dd999fae4  build.sbt
 60c2fc90c5a54a37762fa0eef9c108a60f988fc4b85a41e82cd4793fee6562ed  build.sh
 6575cc52696206eeb75f17ed07db94038d926b5e0110bcbb09473460bb9faf1b  eitb/eitb
 95ae0b683e995533b506009db879eb8ec32044cb98c249bc0478cd080e2a950a  eitb/src/main/scala/io/github/everanium/itb3/scala/eitb/Main.scala
@@ -26,14 +26,14 @@ ce4233af30bd3ce06894d24ef219a169440bb4db6091e50d8ef9447fe5fdd684  src/main/scala
 8d2872b66d1c0b31d4ce12e2b0192b3076f012b07a66fcf99155626a8027e768  src/main/scala/io/github/everanium/itb3/scala/Opts.scala
 f672e6e282e73ffebddfdb99cd7295c1ffeea28b4df1ba3acce8ac6acc52ed5f  src/main/scala/io/github/everanium/itb3/scala/Pipeline.scala
 f21ed9e7d8c6d874fc31a00ed8227bca7418e740bf28bca79a9fae7111b4d56e  src/main/scala/io/github/everanium/itb3/scala/Profile.scala
-fceb724d01cbd167f8a28e4f3dd1ae502519a4258b514c6e0578d2c6fc2c0b68  src/main/scala/io/github/everanium/itb3/scala/Runtime.scala
+953663d075dabb9daa300b1e855e5c0b9a2c2bd4df88cc1580929576435b1776  src/main/scala/io/github/everanium/itb3/scala/Runtime.scala
 a9844b366ea438c6ad7c2214876dc61d5dd05b78ffd0111408aecee19e1fed19  src/main/scala/io/github/everanium/itb3/scala/Status.scala
 352b189a0049b3bcd680729fa60f27074390a11886bd8329b7e40f25ba64c810  src/test/scala/io/github/everanium/itb3/scala/ErrorsSuite.scala
 b6682eb6ec17cfa6409e79f2c5ccebb167bc60bee4bfea15c5e861e98fbdc2c5  src/test/scala/io/github/everanium/itb3/scala/MessageSuite.scala
 917c441629acd3b6362fc53ccb4fbe8dad31a85936ae8c0b59fe5606ad499f37  src/test/scala/io/github/everanium/itb3/scala/PersistSuite.scala
 fd05c746afa5b9687b7abb851426fce418e3a4a16fa4f4bf6bea496adeb1510c  src/test/scala/io/github/everanium/itb3/scala/RekeySuite.scala
 fc43baa189467fa6e14f27756db9b5e9f2ebfca5fc24f6d33d6c264603c67654  src/test/scala/io/github/everanium/itb3/scala/RuntimeSuite.scala
-9ca1495034774eec8f47801859366eef5db114f1634473b43b5f2cc5d4e1e37a  src/test/scala/io/github/everanium/itb3/scala/SmokeSuite.scala
+a64785cf1b2af642d335df74b3d79049a40f3ca667d8e9aff584b581428e93c6  src/test/scala/io/github/everanium/itb3/scala/SmokeSuite.scala
 2f807925aac07a1a7fda31959f7b3eab5b43eca01e5835d16ef84531f0abca3c  src/test/scala/io/github/everanium/itb3/scala/StreamCancelSuite.scala
 34050cdc79bc39893ca954d1718826bdec03efd296ec701d472a84dd8f4a54c2  src/test/scala/io/github/everanium/itb3/scala/StreamIncrementalSuite.scala
 6706f8816d75fb637d16a13df261c90084ffc2a0c0f0650a124a361753acc493  src/test/scala/io/github/everanium/itb3/scala/StreamPumpSuite.scala
