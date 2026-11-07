@@ -94,6 +94,11 @@ class PersistSuite extends ItbSuite:
       assert(prof.toJson.contains("\"nonce_bits\":256"))
       assert(prof.toJson.contains("\"barrier_fill\":4"))
     }
+    Using.resource(ok(Pipeline.init("streaming-aead-triple-mac-v1", Opts().withMode(3)))) { pipe =>
+      val prof = ok(Pipeline.inspect(ok(pipe.save())))
+      assertEquals(prof.containerMode(), Integer.valueOf(3))
+      assert(prof.toJson.contains("\"container_mode\":3"))
+    }
 
     // The registry entry is the recipe alone — neither field is part
     // of it, so both read as absent rather than as zero.

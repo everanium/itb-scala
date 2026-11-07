@@ -22,7 +22,7 @@ class SmokeSuite extends ItbSuite:
 
   test("library version is non-empty") {
     assert(Runtime.version.nonEmpty)
-    assertEquals(Runtime.BindingVersion, "0.9.0")
+    assertEquals(Runtime.BindingVersion, "0.9.1")
   }
 
   test("auto DRBG tier is a fill cipher") {

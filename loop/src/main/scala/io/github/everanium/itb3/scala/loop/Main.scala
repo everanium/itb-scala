@@ -290,7 +290,7 @@ object Main:
       ),
       Flag(
         "blob-mode", "int",
-        "container floor sizing mode: 1 (per-region, default) | 2 (per-container)",
+        "container floor sizing mode: 1 (per-region, default) | 2 (per-container) | 3 (gauss-posit)",
         false, defaultOf(d.blobMode),
         (f, s) => storeInt(s).exists(v => { f.blobMode = v; true })
       ),
@@ -626,9 +626,9 @@ object Main:
         s"loop: --nonce-bits must be 128 | 256 | 512 (or 0 = profile default), got ${f.nonceBits}"
       )
       return (None, 2)
-    if !Set(1L, 2L).contains(f.blobMode) then
+    if !Set(1L, 2L, 3L).contains(f.blobMode) then
       System.err.println(
-        s"loop: --blob-mode must be 1 (per-region) | 2 (per-container), got ${f.blobMode}"
+        s"loop: --blob-mode must be 1 (per-region) | 2 (per-container) | 3 (gauss-posit), got ${f.blobMode}"
       )
       return (None, 2)
     if !Set(0L, 1L, 2L, 4L, 8L, 16L, 32L).contains(f.barrierFill) then
@@ -819,8 +819,8 @@ object Main:
             s" mac=${dash(rec.mac())}" +
             s" parallax=${onOff(rec.parallax())}" +
             s" wrapper=${onOff(rec.wrapper())}" +
-            (if rec.containerMode() != null && rec.containerMode().intValue == 2 then
-               " container-mode=2"
+            (if rec.containerMode() != null && (rec.containerMode().intValue == 2 || rec.containerMode().intValue == 3) then
+               s" container-mode=${rec.containerMode()}"
              else "") +
             (if rec.drbg().isEmpty then "" else s" drbg=${rec.drbg()}") +
             (if rec.interlock().isEmpty then "" else s" interlock=${rec.interlock()}")
